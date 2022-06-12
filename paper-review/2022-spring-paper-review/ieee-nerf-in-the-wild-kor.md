@@ -11,23 +11,15 @@ description: (Description) Martin-Brualla et al. / NeRF in the Wild: Neural Radi
 
 수식으로서 두 아키텍쳐의 차이점을 나타내자면, 오리지널 NeRF는 
 
-$$
-\begin{gathered}
-\hat{\mathbf{C}}(\mathbf{r})=\mathcal{R}(\mathbf{r}, \mathbf{c}, \sigma)=\sum_{k=1}^{K} T\left(t_{k}\right) \alpha\left(\sigma\left(t_{k}\right) \delta_{k}\right) \mathbf{c}\left(t_{k}\right)\\
-
-
-\text{where} T\left(t_{k}\right)=\exp \left(-\sum_{k^{\prime}=1}^{k-1} \sigma\left(t_{k^{\prime}}\right) \delta_{k^{\prime}}\right)
-\end{gathered},
-$$ 
+$$\hat{\mathbf{C}}(\mathbf{r})=\mathcal{R}(\mathbf{r}, \mathbf{c}, \sigma)=\sum_{k=1}^{K} T\left(t_{k}\right) \alpha\left(\sigma\left(t_{k}\right) \delta_{k}\right) \mathbf{c}\left(t_{k}\right)\\
+\text{where} T\left(t_{k}\right)=\exp \left(-\sum_{k^{\prime}=1}^{k-1} \sigma\left(t_{k^{\prime}}\right) \delta_{k^{\prime}}\right)$$ 
 
 
 여기서 $\hat{\mathbf{C}}$ 란 카메라 레이 $\mathbf{r}$ 을 인풋으로 삼아 아웃풋으로는 이 카메라 레이의 샘플링 디스트리뷰션 $\mathbf{K}$에 따른 expected color입니다. NeRF-W에서는 여기에서 transient modelling head를 추가 하게 되는데 이는
 
-$$
-\hat{\mathbf{C}}_{i}(\mathbf{r})=\sum_{k=1}^{K} T_{i}\left(t_{k}\right)\left(\alpha\left(\sigma\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}\left(t_{k}\right)+\alpha\left(\sigma_{i}^{(\tau)}\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}^{(\tau)}\left(t_{k}\right)\right)
+$$\hat{\mathbf{C}}_{i}(\mathbf{r})=\sum_{k=1}^{K} T_{i}\left(t_{k}\right)\left(\alpha\left(\sigma\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}\left(t_{k}\right)+\alpha\left(\sigma_{i}^{(\tau)}\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}^{(\tau)}\left(t_{k}\right)\right)$$
 
-where \(T_{i}\left(t_{k}\right)=\exp \left(-\sum_{k^{\prime}=1}^{k-1}\left(\sigma\left(t_{k^{\prime}}\right)+\sigma_{i}^{(\tau)}\left(t_{k^{\prime}}\right)\right) \delta_{k^{\prime}}\right)\).
-$$ 
+$$where \(T_{i}\left(t_{k}\right)=\exp \left(-\sum_{k^{\prime}=1}^{k-1}\left(\sigma\left(t_{k^{\prime}}\right)+\sigma_{i}^{(\tau)}\left(t_{k^{\prime}}\right)\right) \delta_{k^{\prime}}\right)\)$$
 
 
 로 표현이 됩니다. 이 두 아키텍처의 유일한 차의점은 transient $\tau$의 유무 인데, 이는 모두 transient head의 아웃풋에서 비롯되는 변화입니다. 단순하게 생각해 보시면, $\sigma$ density vector의 값이 카메라 레이 선상 quadrature point인 $\left(t_{k}\right)$을 인풋으로 삼아 투명도를 결정하면, 이를 $\delta_{k}$ quadrature point 선상의 difference에 곱하고, 그리고 컬러 벡터 $\mathbf{c}_{i}$에 곱하게 됩니다. 이 프로세스는 $\tau$ 로 표시된 transient head 의 값들에도 동일하게 적용 됩니다. 이 값들이 어떻게 연산되는지는 3번 method 섹션에서 조금더 자세하게 다루게 됩니다. 
@@ -46,10 +38,8 @@ Novel View Synthesis 의 분야는 이 둘중 더 오래된 분야로, 여러가
 
 오리지널 NeRF 논문이 이중 하나이며, 이들은 volume을 직접적으로 모델이 학습한다고 하여 이름이 붙여졌습니다. 조금 더 자세히 말하면, 이 네트웍의 학습목적은 이미지 안에 내재되어 있는 볼륨, 즉 공간을 학습하는 것이라고 볼 수 있습니다. 바닐라 NeRF는 MLP 두개를 이용하여 radiance field를 학습하는데, 이전과는 화질이 현저희 선명해지는 차이를 볼 수 있으며, 이는 모델안에서 쓰이는 positional encoding에 의한 것이라고 볼수 있습니다. 이를 수식으로 표현해 보자면,
 
-$$\begin{aligned}
-{[\sigma(t), \mathbf{z}(t)] } &=\operatorname{MLP}_{\theta_{1}}\left(\gamma_{\mathbf{x}}(\mathbf{r}(t))\right) \\
-\mathbf{c}(t) &=\operatorname{MLP}_{\theta_{2}}\left(\mathbf{z}(t), \gamma_{\mathbf{d}}(\mathbf{d})\right)
-\end{aligned}$$ 
+$${[\sigma(t), \mathbf{z}(t)] } &=\operatorname{MLP}_{\theta_{1}}\left(\gamma_{\mathbf{x}}(\mathbf{r}(t))\right) \\
+\mathbf{c}(t) &=\operatorname{MLP}_{\theta_{2}}\left(\mathbf{z}(t), \gamma_{\mathbf{d}}(\mathbf{d})\right)$$ 
 
 이는 즉슨, $\operatorname{MLP}_{\theta_{1}}$ 은 카메라 레이 정보 벡터 $\mathbf{r}(t)$에서 추출된 positional encoding vector $\gamma_{x}$ 를 인풋으로 받고 투명도 벡터 $\sigma$ 와 $\operatorname{MLP}_{\theta_{2}}$ 로 전달될 $\mathbf{z}$ 가 아웃풋 됩니다. $\operatorname{MLP}_{\theta_{2}}$ 에서는 $\operatorname{MLP}_{\theta_{1}}$ 에서 받은 $\mathbf{z}$ 와 더불어 viewing direction encoding $\gamma_{d}$ 를 인풋으로 받아 RGB 벡터 $\mathbf{c}(t)$를 추출하게 됩니다.
 
@@ -104,18 +94,15 @@ $$
 여기서 transient head 의 수식을 살펴보면 도움이 될것 같습니다.
 
 $$
-\begin{gathered}
 {\left[\sigma_{i}^{(\tau)}(t), \mathbf{c}_{i}^{(\tau)}(t), \tilde{\beta}_{i}(t)\right]=\operatorname{MLP}_{\theta_{3}}\left(\mathbf{z}(t), \ell_{i}^{(\tau)}\right)} \\
 \beta_{i}(t)=\beta_{\min }+\log \left(1+\exp \left(\tilde{\beta}_{i}(t)\right)\right)
-\end{gathered}
 $$ 
 
 $\operatorname{MLP}_{\theta_{3}}$ 는 $\operatorname{MLP}_{\theta_{1}}$ 에서 받은 $\mathbf{z}(t)$ 값과 temporary embedding $\ell_{i}^{(\tau)}$ 를 받고 density vector, RGB value, 그리고 우리의 uncertainty matrix $\tilde{\beta}_{i}(t)$를 제공합니다.
 
 앞에서는 단순히 "difference 값을 (e) uncertainty variance로 곱한 값이 로스값이 됩니다." 라고 했지만 사실 로스값은 조금 더 복잡하게 계산됩니다. 이 정확한 프로세스가 궁금하신분들은 다음 식을 참고하시기 바랍니다.
 
-$$L_{i}(\mathbf{r})=\frac{\left\|\mathbf{C}_{i}(\mathbf{r})-\hat{\mathbf{C}}_{i}(\mathbf{r})\right\|_{2}^{2}}{2 \beta_{i}(\mathbf{r})^{2}}+\frac{\log \beta_{i}(\mathbf{r})^{2}}{2}+\frac{\lambda_{u}}{K} \sum_{k=1}^{K} \sigma_{i}^{(\tau)}\left(t_{k}\right)
-$$
+$$L_{i}(\mathbf{r})=\frac{\left\|\mathbf{C}_{i}(\mathbf{r})-\hat{\mathbf{C}}_{i}(\mathbf{r})\right\|_{2}^{2}}{2 \beta_{i}(\mathbf{r})^{2}}+\frac{\log \beta_{i}(\mathbf{r})^{2}}{2}+\frac{\lambda_{u}}{K} \sum_{k=1}^{K} \sigma_{i}^{(\tau)}\left(t_{k}\right)$$
 
 
 
