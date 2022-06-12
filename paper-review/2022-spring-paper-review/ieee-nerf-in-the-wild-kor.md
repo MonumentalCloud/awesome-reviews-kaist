@@ -19,11 +19,7 @@ $$
 
 여기서 $\hat{\mathbf{C}}$ 란 카메라 레이 $\mathbf{r}$ 을 인풋으로 삼아 아웃풋으로는 이 카메라 레이의 샘플링 디스트리뷰션 $\mathbf{K}$에 따른 expected color입니다. NeRF-W에서는 여기에서 transient modelling head를 추가 하게 되는데 이는
 
-$$
-\begin{gathered}
-    \hat{\mathbf{C}}_{i}(\mathbf{r})=\sum_{k=1}^{K} T_{i}\left(t_{k}\right)\left(\alpha\left(\sigma\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}\left(t_{k}\right)+\alpha\left(\sigma_{i}^{(\tau)}\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}^{(\tau)}\left(t_{k}\right)\right) \\ where \(T_{i}\left(t_{k}\right)=\exp \left(-\sum_{k^{\prime}=1}^{k-1}\left(\sigma\left(t_{k^{\prime}}\right)+\sigma_{i}^{(\tau)}\left(t_{k^{\prime}}\right)\right) \delta_{k^{\prime}}\right)\). 
-\end{gathered}
-$$
+$$\begin{gathered}\hat{\mathbf{C}}_{i}(\mathbf{r})=\sum_{k=1}^{K} T_{i}\left(t_{k}\right)\left(\alpha\left(\sigma\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}\left(t_{k}\right)+\alpha\left(\sigma_{i}^{(\tau)}\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}^{(\tau)}\left(t_{k}\right)\right) \\ where \(T_{i}\left(t_{k}\right)=\exp \left(-\sum_{k^{\prime}=1}^{k-1}\left(\sigma\left(t_{k^{\prime}}\right)+\sigma_{i}^{(\tau)}\left(t_{k^{\prime}}\right)\right) \delta_{k^{\prime}}\right)\). \end{gathered} $$
 
 로 표현이 됩니다. 이 두 아키텍처의 유일한 차의점은 transient $\tau$의 유무 인데, 이는 모두 transient head의 아웃풋에서 비롯되는 변화입니다. 단순하게 생각해 보시면, $\sigma$ density vector의 값이 카메라 레이 선상 quadrature point인 $\left(t_{k}\right)$을 인풋으로 삼아 투명도를 결정하면, 이를 $\delta_{k}$ quadrature point 선상의 difference에 곱하고, 그리고 컬러 벡터 $\mathbf{c}_{i}$에 곱하게 됩니다. 이 프로세스는 $\tau$ 로 표시된 transient head 의 값들에도 동일하게 적용 됩니다. 이 값들이 어떻게 연산되는지는 3번 method 섹션에서 조금더 자세하게 다루게 됩니다. 
 
