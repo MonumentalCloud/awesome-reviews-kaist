@@ -79,9 +79,7 @@ $$
 
 두번째로 transient objects들을 제거하기 위해서 앞에서도 말했듯이 NeRF-W 는 transient head를 제안합니다. 이 transient head에서 아웃풋된 RGB value 와 density $\sigma$를 permanent head 에서 아웃풋된 같은 값들과 다음과 같은 식으로 합칩니다.
 
-$$
-\hat{\mathbf{C}}_{i}(\mathbf{r})=\sum_{k=1}^{K} T_{i}\left(t_{k}\right)\left(\alpha\left(\sigma\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}\left(t_{k}\right)+\alpha\left(\sigma_{i}^{(\tau)}\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}^{(\tau)}\left(t_{k}\right)\right)
-$$ 
+$$\hat{\mathbf{C}}_{i}(\mathbf{r})=\sum_{k=1}^{K} T_{i}\left(t_{k}\right)\left(\alpha\left(\sigma\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}\left(t_{k}\right)+\alpha\left(\sigma_{i}^{(\tau)}\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}^{(\tau)}\left(t_{k}\right)\right)$$ 
 
 오리지널과 달라진건 식의 transient head 값을 나타내는 두번째 파트인 $\alpha\left(\sigma_{i}^{(\tau)}\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}^{(\tau)}\left(t_{k}\right)$가 추가되었다는것입니다.  조금 더 쉽게 이해하기 위해서 이미지를 살펴 보도록 하죠.
 
@@ -93,10 +91,8 @@ $$
 
 여기서 transient head 의 수식을 살펴보면 도움이 될것 같습니다.
 
-$$
-{\left[\sigma_{i}^{(\tau)}(t), \mathbf{c}_{i}^{(\tau)}(t), \tilde{\beta}_{i}(t)\right]=\operatorname{MLP}_{\theta_{3}}\left(\mathbf{z}(t), \ell_{i}^{(\tau)}\right)} \\
-\beta_{i}(t)=\beta_{\min }+\log \left(1+\exp \left(\tilde{\beta}_{i}(t)\right)\right)
-$$ 
+$${\left[\sigma_{i}^{(\tau)}(t), \mathbf{c}_{i}^{(\tau)}(t), \tilde{\beta}_{i}(t)\right]=\operatorname{MLP}_{\theta_{3}}\left(\mathbf{z}(t), \ell_{i}^{(\tau)}\right)} \\
+\beta_{i}(t)=\beta_{\min }+\log \left(1+\exp \left(\tilde{\beta}_{i}(t)\right)\right)$$ 
 
 $\operatorname{MLP}_{\theta_{3}}$ 는 $\operatorname{MLP}_{\theta_{1}}$ 에서 받은 $\mathbf{z}(t)$ 값과 temporary embedding $\ell_{i}^{(\tau)}$ 를 받고 density vector, RGB value, 그리고 우리의 uncertainty matrix $\tilde{\beta}_{i}(t)$를 제공합니다.
 
