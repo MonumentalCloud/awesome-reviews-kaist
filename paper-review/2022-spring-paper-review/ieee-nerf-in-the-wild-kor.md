@@ -44,7 +44,7 @@ $$
 \end{aligned}
 $$
 
-이는 즉슨, $ {MLP}_{\theta_{1}}$ 은 카메라 레이 정보 벡터 $ \mathbf{r}(t)$에서 추출된 positional encoding vector $\gamma_{x}$ 를 인풋으로 받고 투명도 벡터 $\sigma$ 와 $\operatorname{MLP}_{\theta_{2}}$ 로 전달될 $\mathbf{z}$ 가 아웃풋 됩니다. $\operatorname{MLP}_{\theta_{2}}$ 에서는 $\operatorname{MLP}_{\theta_{1}}$ 에서 받은 $\mathbf{z}$ 와 더불어 viewing direction encoding $\gamma_{d}$ 를 인풋으로 받아 RGB 벡터 $\mathbf{c}(t)$를 추출하게 됩니다.
+이는 즉슨, $$ {MLP}_{\theta_{1}}$$ 은 카메라 레이 정보 벡터 $ \mathbf{r}(t)$에서 추출된 positional encoding vector $\gamma_{x}$ 를 인풋으로 받고 투명도 벡터 $\sigma$ 와 $\operatorname{MLP}_{\theta_{2}}$ 로 전달될 $\mathbf{z}$ 가 아웃풋 됩니다. $\operatorname{MLP}_{\theta_{2}}$ 에서는 $\operatorname{MLP}_{\theta_{1}}$ 에서 받은 $\mathbf{z}$ 와 더불어 viewing direction encoding $\gamma_{d}$ 를 인풋으로 받아 RGB 벡터 $\mathbf{c}(t)$를 추출하게 됩니다.
 
 ### Idea
 
