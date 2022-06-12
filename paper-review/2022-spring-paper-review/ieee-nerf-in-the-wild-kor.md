@@ -11,27 +11,24 @@ description: (Description) Martin-Brualla et al. / NeRF in the Wild: Neural Radi
 
 수식으로서 두 아키텍쳐의 차이점을 나타내자면, 오리지널 NeRF는 
 
-<!-- $$
+$$
 \begin{gathered}
 \hat{\mathbf{C}}(\mathbf{r})=\mathcal{R}(\mathbf{r}, \mathbf{c}, \sigma)=\sum_{k=1}^{K} T\left(t_{k}\right) \alpha\left(\sigma\left(t_{k}\right) \delta_{k}\right) \mathbf{c}\left(t_{k}\right)\\
 
 
 \text{where} T\left(t_{k}\right)=\exp \left(-\sum_{k^{\prime}=1}^{k-1} \sigma\left(t_{k^{\prime}}\right) \delta_{k^{\prime}}\right)
 \end{gathered},
-$$ --> 
+$$ 
 
-<div align="center"><img style="background: white;" src="https://render.githubusercontent.com/render/math?math=%5Cbegin%7Bgathered%7D%0A%5Chat%7B%5Cmathbf%7BC%7D%7D(%5Cmathbf%7Br%7D)%3D%5Cmathcal%7BR%7D(%5Cmathbf%7Br%7D%2C%20%5Cmathbf%7Bc%7D%2C%20%5Csigma)%3D%5Csum_%7Bk%3D1%7D%5E%7BK%7D%20T%5Cleft(t_%7Bk%7D%5Cright)%20%5Calpha%5Cleft(%5Csigma%5Cleft(t_%7Bk%7D%5Cright)%20%5Cdelta_%7Bk%7D%5Cright)%20%5Cmathbf%7Bc%7D%5Cleft(t_%7Bk%7D%5Cright)%5C%5C%0A%0A%0A%5Ctext%7Bwhere%7D%20T%5Cleft(t_%7Bk%7D%5Cright)%3D%5Cexp%20%5Cleft(-%5Csum_%7Bk%5E%7B%5Cprime%7D%3D1%7D%5E%7Bk-1%7D%20%5Csigma%5Cleft(t_%7Bk%5E%7B%5Cprime%7D%7D%5Cright)%20%5Cdelta_%7Bk%5E%7B%5Cprime%7D%7D%5Cright)%0A%5Cend%7Bgathered%7D%2C"></div>
 
 여기서 $\hat{\mathbf{C}}$ 란 카메라 레이 $\mathbf{r}$ 을 인풋으로 삼아 아웃풋으로는 이 카메라 레이의 샘플링 디스트리뷰션 $\mathbf{K}$에 따른 expected color입니다. NeRF-W에서는 여기에서 transient modelling head를 추가 하게 되는데 이는
 
-<!-- $$
+$$
 \hat{\mathbf{C}}_{i}(\mathbf{r})=\sum_{k=1}^{K} T_{i}\left(t_{k}\right)\left(\alpha\left(\sigma\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}\left(t_{k}\right)+\alpha\left(\sigma_{i}^{(\tau)}\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}^{(\tau)}\left(t_{k}\right)\right)
 
 where \(T_{i}\left(t_{k}\right)=\exp \left(-\sum_{k^{\prime}=1}^{k-1}\left(\sigma\left(t_{k^{\prime}}\right)+\sigma_{i}^{(\tau)}\left(t_{k^{\prime}}\right)\right) \delta_{k^{\prime}}\right)\).
+$$ 
 
-$$ --> 
-
-<div align="center"><img style="background: white;" src="https://render.githubusercontent.com/render/math?math=%5Chat%7B%5Cmathbf%7BC%7D%7D_%7Bi%7D(%5Cmathbf%7Br%7D)%3D%5Csum_%7Bk%3D1%7D%5E%7BK%7D%20T_%7Bi%7D%5Cleft(t_%7Bk%7D%5Cright)%5Cleft(%5Calpha%5Cleft(%5Csigma%5Cleft(t_%7Bk%7D%5Cright)%20%5Cdelta_%7Bk%7D%5Cright)%20%5Cmathbf%7Bc%7D_%7Bi%7D%5Cleft(t_%7Bk%7D%5Cright)%2B%5Calpha%5Cleft(%5Csigma_%7Bi%7D%5E%7B(%5Ctau)%7D%5Cleft(t_%7Bk%7D%5Cright)%20%5Cdelta_%7Bk%7D%5Cright)%20%5Cmathbf%7Bc%7D_%7Bi%7D%5E%7B(%5Ctau)%7D%5Cleft(t_%7Bk%7D%5Cright)%5Cright)%0A%0Awhere%20%5C(T_%7Bi%7D%5Cleft(t_%7Bk%7D%5Cright)%3D%5Cexp%20%5Cleft(-%5Csum_%7Bk%5E%7B%5Cprime%7D%3D1%7D%5E%7Bk-1%7D%5Cleft(%5Csigma%5Cleft(t_%7Bk%5E%7B%5Cprime%7D%7D%5Cright)%2B%5Csigma_%7Bi%7D%5E%7B(%5Ctau)%7D%5Cleft(t_%7Bk%5E%7B%5Cprime%7D%7D%5Cright)%5Cright)%20%5Cdelta_%7Bk%5E%7B%5Cprime%7D%7D%5Cright)%5C).%0A"></div>
 
 로 표현이 됩니다. 이 두 아키텍처의 유일한 차의점은 transient $\tau$의 유무 인데, 이는 모두 transient head의 아웃풋에서 비롯되는 변화입니다. 단순하게 생각해 보시면, $\sigma$ density vector의 값이 카메라 레이 선상 quadrature point인 $\left(t_{k}\right)$을 인풋으로 삼아 투명도를 결정하면, 이를 $\delta_{k}$ quadrature point 선상의 difference에 곱하고, 그리고 컬러 벡터 $\mathbf{c}_{i}$에 곱하게 됩니다. 이 프로세스는 $\tau$ 로 표시된 transient head 의 값들에도 동일하게 적용 됩니다. 이 값들이 어떻게 연산되는지는 3번 method 섹션에서 조금더 자세하게 다루게 됩니다. 
 
@@ -49,12 +46,10 @@ Novel View Synthesis 의 분야는 이 둘중 더 오래된 분야로, 여러가
 
 오리지널 NeRF 논문이 이중 하나이며, 이들은 volume을 직접적으로 모델이 학습한다고 하여 이름이 붙여졌습니다. 조금 더 자세히 말하면, 이 네트웍의 학습목적은 이미지 안에 내재되어 있는 볼륨, 즉 공간을 학습하는 것이라고 볼 수 있습니다. 바닐라 NeRF는 MLP 두개를 이용하여 radiance field를 학습하는데, 이전과는 화질이 현저희 선명해지는 차이를 볼 수 있으며, 이는 모델안에서 쓰이는 positional encoding에 의한 것이라고 볼수 있습니다. 이를 수식으로 표현해 보자면,
 
-<!-- $$\begin{aligned}
+$$\begin{aligned}
 {[\sigma(t), \mathbf{z}(t)] } &=\operatorname{MLP}_{\theta_{1}}\left(\gamma_{\mathbf{x}}(\mathbf{r}(t))\right) \\
 \mathbf{c}(t) &=\operatorname{MLP}_{\theta_{2}}\left(\mathbf{z}(t), \gamma_{\mathbf{d}}(\mathbf{d})\right)
-\end{aligned}$$ --> 
-
-<div align="center"><img style="background: white;" src="https://render.githubusercontent.com/render/math?math=%7B%5B%5Csigma(t)%2C%20%5Cmathbf%7Bz%7D(t)%5D%20%7D%20%26%3D%5Coperatorname%7BMLP%7D_%7B%5Ctheta_%7B1%7D%7D%5Cleft(%5Cgamma_%7B%5Cmathbf%7Bx%7D%7D(%5Cmathbf%7Br%7D(t))%5Cright)%20%5C%5C%0A%5Cmathbf%7Bc%7D(t)%20%26%3D%5Coperatorname%7BMLP%7D_%7B%5Ctheta_%7B2%7D%7D%5Cleft(%5Cmathbf%7Bz%7D(t)%2C%20%5Cgamma_%7B%5Cmathbf%7Bd%7D%7D(%5Cmathbf%7Bd%7D)%5Cright)"></div>
+\end{aligned}$$ 
 
 이는 즉슨, $\operatorname{MLP}_{\theta_{1}}$ 은 카메라 레이 정보 벡터 $\mathbf{r}(t)$에서 추출된 positional encoding vector $\gamma_{x}$ 를 인풋으로 받고 투명도 벡터 $\sigma$ 와 $\operatorname{MLP}_{\theta_{2}}$ 로 전달될 $\mathbf{z}$ 가 아웃풋 됩니다. $\operatorname{MLP}_{\theta_{2}}$ 에서는 $\operatorname{MLP}_{\theta_{1}}$ 에서 받은 $\mathbf{z}$ 와 더불어 viewing direction encoding $\gamma_{d}$ 를 인풋으로 받아 RGB 벡터 $\mathbf{c}(t)$를 추출하게 됩니다.
 
@@ -78,14 +73,13 @@ Novel View Synthesis 의 분야는 이 둘중 더 오래된 분야로, 여러가
 
 이는 Bojanowski et al. 의 Generative Latent Optimization (GLO)에서 착안한 것인데, 데이터셋 안의 모든 이미지에 appearance embedding vector $\ell$을 매기는 것입니다. 따라서, 우리는 오리지널 NeRF의 컬러계산법을 다음과 같이 업데이트 합니다.
 
-<!-- $$
+$$
 \begin{gathered}
 \hat{\mathbf{C}}_{i}(\mathbf{r})=\mathcal{R}\left(\mathbf{r}, \mathbf{c}_{i}, \sigma\right) \\
 \mathbf{c}_{i}(t)=\operatorname{MLP}_{\theta_{2}}\left(\mathbf{z}(t), \gamma_{\mathbf{d}}(\mathbf{d}), \ell_{i}^{(a)}\right)
 \end{gathered}
-$$ --> 
+$$ 
 
-<div align="center"><img style="background: white;" src="https://render.githubusercontent.com/render/math?math=%5Cbegin%7Bgathered%7D%0A%5Chat%7B%5Cmathbf%7BC%7D%7D_%7Bi%7D(%5Cmathbf%7Br%7D)%3D%5Cmathcal%7BR%7D%5Cleft(%5Cmathbf%7Br%7D%2C%20%5Cmathbf%7Bc%7D_%7Bi%7D%2C%20%5Csigma%5Cright)%20%5C%5C%0A%5Cmathbf%7Bc%7D_%7Bi%7D(t)%3D%5Coperatorname%7BMLP%7D_%7B%5Ctheta_%7B2%7D%7D%5Cleft(%5Cmathbf%7Bz%7D(t)%2C%20%5Cgamma_%7B%5Cmathbf%7Bd%7D%7D(%5Cmathbf%7Bd%7D)%2C%20%5Cell_%7Bi%7D%5E%7B(a)%7D%5Cright)%0A%5Cend%7Bgathered%7D"></div>
 
 오리지널과 비교해보면 $\operatorname{MLP}_{\theta_{2}}$ 의 인풋에 $\ell_{i}^{(a)}$이 추가된 것을 볼 수 있습니다. 이는 앞에서 말해준 permanent head에 다이렉트하게 인풋 됩니다. 그래서 정확히 이 appearance embedding 이 무엇일까요? 만약에 $\operatorname{MLP}_{\theta_{2}}$의 모든 다른 인풋들이 안정되어 있다고 가정 한다면, $\ell_{i}^{(a)}$를 조정하는 것은 다음과 같은 결과를 낼 수 있습니다.
 
@@ -95,11 +89,9 @@ $$ -->
 
 두번째로 transient objects들을 제거하기 위해서 앞에서도 말했듯이 NeRF-W 는 transient head를 제안합니다. 이 transient head에서 아웃풋된 RGB value 와 density $\sigma$를 permanent head 에서 아웃풋된 같은 값들과 다음과 같은 식으로 합칩니다.
 
-<!-- $$
+$$
 \hat{\mathbf{C}}_{i}(\mathbf{r})=\sum_{k=1}^{K} T_{i}\left(t_{k}\right)\left(\alpha\left(\sigma\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}\left(t_{k}\right)+\alpha\left(\sigma_{i}^{(\tau)}\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}^{(\tau)}\left(t_{k}\right)\right)
-$$ --> 
-
-<div align="center"><img style="background: white;" src="https://render.githubusercontent.com/render/math?math=%5Chat%7B%5Cmathbf%7BC%7D%7D_%7Bi%7D(%5Cmathbf%7Br%7D)%3D%5Csum_%7Bk%3D1%7D%5E%7BK%7D%20T_%7Bi%7D%5Cleft(t_%7Bk%7D%5Cright)%5Cleft(%5Calpha%5Cleft(%5Csigma%5Cleft(t_%7Bk%7D%5Cright)%20%5Cdelta_%7Bk%7D%5Cright)%20%5Cmathbf%7Bc%7D_%7Bi%7D%5Cleft(t_%7Bk%7D%5Cright)%2B%5Calpha%5Cleft(%5Csigma_%7Bi%7D%5E%7B(%5Ctau)%7D%5Cleft(t_%7Bk%7D%5Cright)%20%5Cdelta_%7Bk%7D%5Cright)%20%5Cmathbf%7Bc%7D_%7Bi%7D%5E%7B(%5Ctau)%7D%5Cleft(t_%7Bk%7D%5Cright)%5Cright)"></div>
+$$ 
 
 오리지널과 달라진건 식의 transient head 값을 나타내는 두번째 파트인 $\alpha\left(\sigma_{i}^{(\tau)}\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}^{(\tau)}\left(t_{k}\right)$가 추가되었다는것입니다.  조금 더 쉽게 이해하기 위해서 이미지를 살펴 보도록 하죠.
 
@@ -111,28 +103,27 @@ $$ -->
 
 여기서 transient head 의 수식을 살펴보면 도움이 될것 같습니다.
 
-<!-- $
+$$
 \begin{gathered}
 {\left[\sigma_{i}^{(\tau)}(t), \mathbf{c}_{i}^{(\tau)}(t), \tilde{\beta}_{i}(t)\right]=\operatorname{MLP}_{\theta_{3}}\left(\mathbf{z}(t), \ell_{i}^{(\tau)}\right)} \\
 \beta_{i}(t)=\beta_{\min }+\log \left(1+\exp \left(\tilde{\beta}_{i}(t)\right)\right)
 \end{gathered}
-$ --> <img style="transform: translateY(0.1em); background: white;" src="https://render.githubusercontent.com/render/math?math=%5Cbegin%7Bgathered%7D%0A%7B%5Cleft%5B%5Csigma_%7Bi%7D%5E%7B(%5Ctau)%7D(t)%2C%20%5Cmathbf%7Bc%7D_%7Bi%7D%5E%7B(%5Ctau)%7D(t)%2C%20%5Ctilde%7B%5Cbeta%7D_%7Bi%7D(t)%5Cright%5D%3D%5Coperatorname%7BMLP%7D_%7B%5Ctheta_%7B3%7D%7D%5Cleft(%5Cmathbf%7Bz%7D(t)%2C%20%5Cell_%7Bi%7D%5E%7B(%5Ctau)%7D%5Cright)%7D%20%5C%5C%0A%5Cbeta_%7Bi%7D(t)%3D%5Cbeta_%7B%5Cmin%20%7D%2B%5Clog%20%5Cleft(1%2B%5Cexp%20%5Cleft(%5Ctilde%7B%5Cbeta%7D_%7Bi%7D(t)%5Cright)%5Cright)%0A%5Cend%7Bgathered%7D">
+$$ 
 
 $\operatorname{MLP}_{\theta_{3}}$ 는 $\operatorname{MLP}_{\theta_{1}}$ 에서 받은 $\mathbf{z}(t)$ 값과 temporary embedding $\ell_{i}^{(\tau)}$ 를 받고 density vector, RGB value, 그리고 우리의 uncertainty matrix $\tilde{\beta}_{i}(t)$를 제공합니다.
 
 앞에서는 단순히 "difference 값을 (e) uncertainty variance로 곱한 값이 로스값이 됩니다." 라고 했지만 사실 로스값은 조금 더 복잡하게 계산됩니다. 이 정확한 프로세스가 궁금하신분들은 다음 식을 참고하시기 바랍니다.
 
-<!-- <img src="https://latex.codecogs.com/gif.latex?$$L_{i}(\mathbf{r})=\frac{\left\|\mathbf{C}_{i}(\mathbf{r})-\hat{\mathbf{C}}_{i}(\mathbf{r})\right\|_{2}^{2}}{2 \beta_{i}(\mathbf{r})^{2}}+\frac{\log \beta_{i}(\mathbf{r})^{2}}{2}+\frac{\lambda_{u}}{K} \sum_{k=1}^{K} \sigma_{i}^{(\tau)}\left(t_{k}\right)
-$$"/> -->
+$$L_{i}(\mathbf{r})=\frac{\left\|\mathbf{C}_{i}(\mathbf{r})-\hat{\mathbf{C}}_{i}(\mathbf{r})\right\|_{2}^{2}}{2 \beta_{i}(\mathbf{r})^{2}}+\frac{\log \beta_{i}(\mathbf{r})^{2}}{2}+\frac{\lambda_{u}}{K} \sum_{k=1}^{K} \sigma_{i}^{(\tau)}\left(t_{k}\right)
+$$
 
-<div align="center"><img style="background: white;" src="https://render.githubusercontent.com/render/math?math=L_%7Bi%7D(%5Cmathbf%7Br%7D)%3D%5Cfrac%7B%5Cleft%5C%7C%5Cmathbf%7BC%7D_%7Bi%7D(%5Cmathbf%7Br%7D)-%5Chat%7B%5Cmathbf%7BC%7D%7D_%7Bi%7D(%5Cmathbf%7Br%7D)%5Cright%5C%7C_%7B2%7D%5E%7B2%7D%7D%7B2%20%5Cbeta_%7Bi%7D(%5Cmathbf%7Br%7D)%5E%7B2%7D%7D%2B%5Cfrac%7B%5Clog%20%5Cbeta_%7Bi%7D(%5Cmathbf%7Br%7D)%5E%7B2%7D%7D%7B2%7D%2B%5Cfrac%7B%5Clambda_%7Bu%7D%7D%7BK%7D%20%5Csum_%7Bk%3D1%7D%5E%7BK%7D%20%5Csigma_%7Bi%7D%5E%7B(%5Ctau)%7D%5Cleft(t_%7Bk%7D%5Cright)"></div>
 
 
 ## 4. Experiment & Result
 
 
 ### Experimental setup
-NeRF-W 논문에서는 모든 실험을 the Brandenberg Gate dataset에 맞춰서 학습합니다. 모든 실험은 Tensorflow2 와 Keras 를 이용하여 진행되고 모든 hyperparameters들은 브랜든버그 게이트 데이터셋에 맞춰 PSNR값이 최대화 되도록 grid matrix search를 합니다. 비교대상들은 related works 섹션에서 나왔던 NRW, NeRF, 그리고 NeRF-W 에서 transient head를 뺀 NeRF-A, 그리고 NeRF-W에서 appearance embedding <img src="https://latex.codecogs.com/gif.latex?\ell_{i}^{(a)}"/>를 제거한 NeRF-U(Uncertainty), 그리고 NeRF-A 와 NeRF-U 를 composite한 NeRF-W 이렇게 다섯가지 모델을 실험합니다. 
+NeRF-W 논문에서는 모든 실험을 the Brandenberg Gate dataset에 맞춰서 학습합니다. 모든 실험은 Tensorflow2 와 Keras 를 이용하여 진행되고 모든 hyperparameters들은 브랜든버그 게이트 데이터셋에 맞춰 PSNR값이 최대화 되도록 grid matrix search를 합니다. 비교대상들은 related works 섹션에서 나왔던 NRW, NeRF, 그리고 NeRF-W 에서 transient head를 뺀 NeRF-A, 그리고 NeRF-W에서 appearance embedding $\ell_{i}^{(a)}$를 제거한 NeRF-U(Uncertainty), 그리고 NeRF-A 와 NeRF-U 를 composite한 NeRF-W 이렇게 다섯가지 모델을 실험합니다. 
 모든 NeRF 들은 batch size 2048에서 300,000 스텝동안 8개의 GPU와 Adam Optimizer를 사용하여 트레이닝합니다. 마지막으로 evaluation metric 으로는 PSNR, MS-SSIM, 그리고 LPIPS를 사용합니다. 
 
 
