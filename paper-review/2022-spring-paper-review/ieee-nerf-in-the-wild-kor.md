@@ -17,9 +17,9 @@ $$\hat{\mathbf{C}}(\mathbf{r})=\mathcal{R}(\mathbf{r}, \mathbf{c}, \sigma)=\sum_
 
 여기서 $\hat{\mathbf{C}}$ 란 카메라 레이 $\mathbf{r}$ 을 인풋으로 삼아 아웃풋으로는 이 카메라 레이의 샘플링 디스트리뷰션 $\mathbf{K}$에 따른 expected color입니다. NeRF-W에서는 여기에서 transient modelling head를 추가 하게 되는데 이는
 
-$$\hat{\mathbf{C}}_{i}(\mathbf{r})=\sum_{k=1}^{K} T_{i}\left(t_{k}\right)\left(\alpha\left(\sigma\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}\left(t_{k}\right)+\alpha\left(\sigma_{i}^{(\tau)}\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}^{(\tau)}\left(t_{k}\right)\right)$$
+$$ \hat{\mathbf{C}}_{i}(\mathbf{r})=\sum_{k=1}^{K} T_{i}\left(t_{k}\right)\left(\alpha\left(\sigma\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}\left(t_{k}\right)+\alpha\left(\sigma_{i}^{(\tau)}\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}^{(\tau)}\left(t_{k}\right)\right) $$
 
-$$where \(T_{i}\left(t_{k}\right)=\exp \left(-\sum_{k^{\prime}=1}^{k-1}\left(\sigma\left(t_{k^{\prime}}\right)+\sigma_{i}^{(\tau)}\left(t_{k^{\prime}}\right)\right) \delta_{k^{\prime}}\right)\)$$
+$$ where \(T_{i}\left(t_{k}\right)=\exp \left(-\sum_{k^{\prime}=1}^{k-1}\left(\sigma\left(t_{k^{\prime}}\right)+\sigma_{i}^{(\tau)}\left(t_{k^{\prime}}\right)\right) \delta_{k^{\prime}}\right)\) $$
 
 
 로 표현이 됩니다. 이 두 아키텍처의 유일한 차의점은 transient $\tau$의 유무 인데, 이는 모두 transient head의 아웃풋에서 비롯되는 변화입니다. 단순하게 생각해 보시면, $\sigma$ density vector의 값이 카메라 레이 선상 quadrature point인 $\left(t_{k}\right)$을 인풋으로 삼아 투명도를 결정하면, 이를 $\delta_{k}$ quadrature point 선상의 difference에 곱하고, 그리고 컬러 벡터 $\mathbf{c}_{i}$에 곱하게 됩니다. 이 프로세스는 $\tau$ 로 표시된 transient head 의 값들에도 동일하게 적용 됩니다. 이 값들이 어떻게 연산되는지는 3번 method 섹션에서 조금더 자세하게 다루게 됩니다. 
@@ -36,10 +36,7 @@ Novel View Synthesis 의 분야는 이 둘중 더 오래된 분야로, 여러가
 
 조금 더 최신에는 뉴럴 네트워크를 이용한 novel view synthesis가 활성화 되었습니다. 특히 이 페이퍼와 가장 비슷한 approach를 가진 논문은 Neural Rerendering in the Wild (NRW) 입니다. 이는 point-cloud 렌더링을 인풋으로 받아들여 사실주의적 이미지를 표출해주는 네트웍으로서, NeRF와는 다른 인풋, 같은 아웃풋을 가지고 있습니다. 이 방법의 가장 큰 문제점은 체커보드 패턴과 temporary artifacts들의 고스팅 현상등 입니다. 다음으로 나온, neural volumetric rendering은 이러한 문제들을 해결하고자 나왔습니다.
 
-오리지널 NeRF 논문이 이중 하나이며, 이들은 volume을 직접적으로 모델이 학습한다고 하여 이름이 붙여졌습니다. 조금 더 자세히 말하면, 이 네트웍의 학습목적은 이미지 안에 내재되어 있는 볼륨, 즉 공간을 학습하는 것이라고 볼 수 있습니다. 바닐라 NeRF는 MLP 두개를 이용하여 radiance field를 학습하는데, 이전과는 화질이 현저희 선명해지는 차이를 볼 수 있으며, 이는 모델안에서 쓰이는 positional encoding에 의한 것이라고 볼수 있습니다. 이를 수식으로 표현해 보자면,
-
-$${[\sigma(t), \mathbf{z}(t)] } &=\operatorname{MLP}_{\theta_{1}}\left(\gamma_{\mathbf{x}}(\mathbf{r}(t))\right) \\
-\mathbf{c}(t) &=\operatorname{MLP}_{\theta_{2}}\left(\mathbf{z}(t), \gamma_{\mathbf{d}}(\mathbf{d})\right)$$ 
+오리지널 NeRF 논문이 이중 하나이며, 이들은 volume을 직접적으로 모델이 학습한다고 하여 이름이 붙여졌습니다. 조금 더 자세히 말하면, 이 네트웍의 학습목적은 이미지 안에 내재되어 있는 볼륨, 즉 공간을 학습하는 것이라고 볼 수 있습니다. 바닐라 NeRF는 MLP 두개를 이용하여 radiance field를 학습하는데, 이전과는 화질이 현저희 선명해지는 차이를 볼 수 있으며, 이는 모델안에서 쓰이는 positional encoding에 의한 것이라고 볼수 있습니다. 이를 수식으로 표현해 보자면, $$ {[\sigma(t), \mathbf{z}(t)] } &=\operatorname{MLP}_{\theta_{1}}\left(\gamma_{\mathbf{x}}(\mathbf{r}(t))\right) \\ \mathbf{c}(t) &=\operatorname{MLP}_{\theta_{2}}\left(\mathbf{z}(t), \gamma_{\mathbf{d}}(\mathbf{d})\right) $$ 
 
 이는 즉슨, $\operatorname{MLP}_{\theta_{1}}$ 은 카메라 레이 정보 벡터 $\mathbf{r}(t)$에서 추출된 positional encoding vector $\gamma_{x}$ 를 인풋으로 받고 투명도 벡터 $\sigma$ 와 $\operatorname{MLP}_{\theta_{2}}$ 로 전달될 $\mathbf{z}$ 가 아웃풋 됩니다. $\operatorname{MLP}_{\theta_{2}}$ 에서는 $\operatorname{MLP}_{\theta_{1}}$ 에서 받은 $\mathbf{z}$ 와 더불어 viewing direction encoding $\gamma_{d}$ 를 인풋으로 받아 RGB 벡터 $\mathbf{c}(t)$를 추출하게 됩니다.
 
@@ -61,14 +58,9 @@ $${[\sigma(t), \mathbf{z}(t)] } &=\operatorname{MLP}_{\theta_{1}}\left(\gamma_{\
 
 첫번째로 photometric variation이란, 이미지 특성의 artifacts 들을 말하는 것인데, 예를들어 똑같은 시간에 똑같은 앵글로 같은 장소에서 사진을 찍었다고 해도, 이미지 포스트 프로세싱에 따라 파이널 사진이 달라지는 경우가 있습니다. 인터넷에서 찾을수 있는 사진들은 거의다 사진기기의 기종이나 이러한 후처리에 따라 똑같은 컨디션이더라도 화이트 밸런스, 톤매핑 등의 특성이 다른 경우가 대부분 입니다. 따라서, 우리의 NeRF-W 가 단순한 이미지 후처리를 뛰어넘어 그 속의 공간을 학습하려면, 아키텍쳐 레벨에서 이러한 photometric variation을 인식할 메커니즘이 필요합니다. 우리는 이걸을 Latent Appearance Modeling이라고 부릅니다.
 
-이는 Bojanowski et al. 의 Generative Latent Optimization (GLO)에서 착안한 것인데, 데이터셋 안의 모든 이미지에 appearance embedding vector $\ell$을 매기는 것입니다. 따라서, 우리는 오리지널 NeRF의 컬러계산법을 다음과 같이 업데이트 합니다.
-
-$$
-\begin{gathered}
-\hat{\mathbf{C}}_{i}(\mathbf{r})=\mathcal{R}\left(\mathbf{r}, \mathbf{c}_{i}, \sigma\right) \\
-\mathbf{c}_{i}(t)=\operatorname{MLP}_{\theta_{2}}\left(\mathbf{z}(t), \gamma_{\mathbf{d}}(\mathbf{d}), \ell_{i}^{(a)}\right)
-\end{gathered}
-$$ 
+이는 Bojanowski et al. 의 Generative Latent Optimization (GLO)에서 착안한 것인데, 데이터셋 안의 모든 이미지에 appearance embedding vector $\ell$을 매기는 것입니다. 따라서, 우리는 오리지널 NeRF의 컬러계산법을 다음과 같이 업데이트 합니다. 
+$$\hat{\mathbf{C}}_{i}(\mathbf{r})=\mathcal{R}\left(\mathbf{r}, \mathbf{c}_{i}, \sigma\right) \\
+\mathbf{c}_{i}(t)=\operatorname{MLP}_{\theta_{2}}\left(\mathbf{z}(t), \gamma_{\mathbf{d}}(\mathbf{d}), \ell_{i}^{(a)}\right)$$ 
 
 
 오리지널과 비교해보면 $\operatorname{MLP}_{\theta_{2}}$ 의 인풋에 $\ell_{i}^{(a)}$이 추가된 것을 볼 수 있습니다. 이는 앞에서 말해준 permanent head에 다이렉트하게 인풋 됩니다. 그래서 정확히 이 appearance embedding 이 무엇일까요? 만약에 $\operatorname{MLP}_{\theta_{2}}$의 모든 다른 인풋들이 안정되어 있다고 가정 한다면, $\ell_{i}^{(a)}$를 조정하는 것은 다음과 같은 결과를 낼 수 있습니다.
@@ -77,9 +69,7 @@ $$
 
 이미 Geometry는  $\operatorname{MLP}_{\theta_{1}}$ 에서 계산 되어있기 때문에, 공간의 왜곡 없이도 photometric variance 를 다시 줄 수 있게 되었습니다.
 
-두번째로 transient objects들을 제거하기 위해서 앞에서도 말했듯이 NeRF-W 는 transient head를 제안합니다. 이 transient head에서 아웃풋된 RGB value 와 density $\sigma$를 permanent head 에서 아웃풋된 같은 값들과 다음과 같은 식으로 합칩니다.
-
-$$\hat{\mathbf{C}}_{i}(\mathbf{r})=\sum_{k=1}^{K} T_{i}\left(t_{k}\right)\left(\alpha\left(\sigma\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}\left(t_{k}\right)+\alpha\left(\sigma_{i}^{(\tau)}\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}^{(\tau)}\left(t_{k}\right)\right)$$ 
+두번째로 transient objects들을 제거하기 위해서 앞에서도 말했듯이 NeRF-W 는 transient head를 제안합니다. 이 transient head에서 아웃풋된 RGB value 와 density $\sigma$를 permanent head 에서 아웃풋된 같은 값들과 다음과 같은 식으로 합칩니다.$$ \hat{\mathbf{C}}_{i}(\mathbf{r})=\sum_{k=1}^{K} T_{i}\left(t_{k}\right)\left(\alpha\left(\sigma\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}\left(t_{k}\right)+\alpha\left(\sigma_{i}^{(\tau)}\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}^{(\tau)}\left(t_{k}\right)\right) $$ 
 
 오리지널과 달라진건 식의 transient head 값을 나타내는 두번째 파트인 $\alpha\left(\sigma_{i}^{(\tau)}\left(t_{k}\right) \delta_{k}\right) \mathbf{c}_{i}^{(\tau)}\left(t_{k}\right)$가 추가되었다는것입니다.  조금 더 쉽게 이해하기 위해서 이미지를 살펴 보도록 하죠.
 
